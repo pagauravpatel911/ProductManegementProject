@@ -90,16 +90,83 @@ const upadateOrder = async function (req, res) {
         .status(400)
         .send({
           status: false,
-<<<<<<< HEAD
-          message: "order is not canclable or product is deleted",
-=======
           message: "order is not canclable or product is alerady deleted",
->>>>>>> b5d1d3ad47beb48636d166f6da9061d36cd0d205
       });
     }catch(error){
       return res.status(500).send({status: false, message: error.message})
     }
 };
+const upadateOrder2 = async function (req, res) {
+  try{
+    let userId = req.params.userId;
+    let orderId = req.body.orderId;
+    let status = req.body.status
+  
+    if (!(validator.isValid(userId) && validator.isValidObjectId(userId))) {
+      return res
+        .status(400)
+        .send({ status: false, message: "user  Id not valid" });
+    }
+    if (!(validator.isValid(orderId) && validator.isValidObjectId(orderId))) {
+      return res
+        .status(400)
+        .send({ status: false, message: "user  Id not valid" });
+    }
+  
+    let cartExist = await cartModel.findOne({userId:userId});
+    if (!cartExist) {
+      return res
+        .status(400)
+        .send({ status: false, message: "This user have no card till Now" });
+    }
+    let findOrder = await orderModel.findById(orderId);
+    if (!findOrder) {
+      return res
+        .status(400)
+        .send({ status: false, message: "Order in not found with this Id" });
+    }
+    if (userId != findOrder.userId) {
+      return res
+        .status(400)
+        .send({ status: false, message: "User is not utherized to do changes" });
+    }
+    if (findOrder.cancellable == true && findOrder.status == "pending" && status  == "cancled" ) {
+      const updateOrder = await orderModel.findOneAndUpdate(
+        { _id: orderId },
+        { $set: { status: "cancled" } },
+        { new: true }
+      );
+      return res
+        .status(200)
+        .send({
+          status: false,
+          message: "Succesfully Cancled Order",
+          data: updateOrder,
+        });
+    } 
+
+    if ( findOrder.status == "pending" && status  == "completed" ) {
+      const updateOrder = await orderModel.findOneAndUpdate(
+        { _id: orderId },
+        { $set: { status: "completed" } },
+        { new: true }
+      );
+      return res
+        .status(200)
+        .send({
+          status: false,
+          message: "Order Succesfully completed",
+          data: updateOrder,
+        });
+
+    }
+
+    return res.status(400).send({status : false, message : 'please enter status or valid order details or order alerady cancle '})
+
+  }catch(error){
+    return res.status(500).send({status: false, message: error.message})
+  }
+};
 
 module.exports.postOrder = postOrder
-module.exports.upadateOrder = upadateOrder
+module.exports.upadateOrder2 = upadateOrder2
