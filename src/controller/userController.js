@@ -142,9 +142,9 @@ const userlogin = async function (req, res){
           return res.status(400).send ({status: false, message: "please provide valid password"})
       }
      //check by regex
-      if(!validator.isValidPW(password)){
-          return res.status(400).send({status: false, message: "please enter valid password, between 8 to 15 characters"})
-      }
+    //   if(!validator.isValidPW(password)){
+    //       return res.status(400).send({status: false, message: "please enter valid password, between 8 to 15 characters"})
+    //   }
       const login = await userModel.findOne({ email: emailId})
       if(!login) {
           return res.status(404).send ({ status: false, message: "email is not register"})
@@ -281,6 +281,7 @@ const updateUser = async (req, res) => {
             updateUserData.password = hash
         }
         const add = JSON.parse(JSON.stringify(isUserExist.address))
+
         // return res.send(add)
         if(data.address){
             data.address = JSON.parse(data.address)
@@ -332,7 +333,7 @@ const updateUser = async (req, res) => {
                     add.billing.pincode = data.address.billing.pincode
                 }
             }
-            updateUserData.address = add
+            updateUserData.address = add// copy from the mongodb and update from the user provide the updated key
         }
         if (!validator.isValidObject(updateUserData)){
             return res.status(400).send({status: false, message: "please enter data for updation"})

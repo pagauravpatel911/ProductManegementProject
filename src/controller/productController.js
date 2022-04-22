@@ -49,9 +49,9 @@ const createProduct = async function (req, res) {
         if (!validator.isValid(availableSizes)) {
             return res.status(400).send({ status: false, message: "Please Provide Available Sizes" })
         }
-        
+    
         availableSizes = JSON.parse(availableSizes)
-        // return res.send({data: availableSizes})
+        // return res.send({data: availablSizes})
         for (let i of availableSizes){
             // console.log(i)
             if(!validator.isValidSize(i)){
